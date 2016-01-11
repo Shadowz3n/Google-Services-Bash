@@ -1,2 +1,2 @@
-# Google Services Bash (IMPS)
+#  GoogleServices Bash (IMPS)
 Google Services with Bash
