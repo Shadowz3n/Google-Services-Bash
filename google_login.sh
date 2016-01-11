@@ -1,7 +1,7 @@
 #!/bin/bash
 # Google Services (IMPS)
 # @autor: Henrique Bissoli Silva (emp.shad@gmail.com)
-# Updates: https://github.com/Shadowz3n/Google+Services
+# Updates: https://github.com/Shadowz3n/Google-Services-Bash
 
 if [[ $1 && $2 ]]; then
 	AGENT='User-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.73 Safari/537.36'
