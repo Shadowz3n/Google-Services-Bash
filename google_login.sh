@@ -1,7 +1,7 @@
 #!/bin/bash
 # Google Services (IMPS)
 # @autor: Henrique Bissoli Silva (emp.shad@gmail.com)
-# Updates: https://github.com/Shadowz3n/Google-Services-Bash
+# Updates: https://github.com/Shadowz3n/GoogleServices-Bash
 
 BANNERT="\e[1m\e[5;32;40m"
 INVERT="\e[7m"
