@@ -24,13 +24,16 @@ banner
 if [[ $1 && $2 ]]; then
 	AGENT='User-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.73 Safari/537.36'
 	INITIAL=`curl -s -L --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/AddSession"`
-	LOGIN=`curl --cookie '/tmp/google_cookies.txt' --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/accountLoginInfoXhr" -d "Email=$1&Page=PasswordSeparationAddSession&requestlocation=https%3A%2F%2Faccounts.google.com%2FAddSession%23identifier"`
+	INITIAL=`echo $INITIAL | grep -Po '(?<=<form|<FORM>).*(?=</form|</FORM)'`
+	GXF=`echo $INITIAL | grep -Po '(?<=gxf" value=").*(?="> <input id="profile)'`
+	#TIMESTMP=`echo $INITIAL | grep -Po '(?<=timeStmp" value=").*(?=\'/>)'`
+	echo $GXF
+	exit 1
+	
+	LOGIN=`curl --cookie '/tmp/google_cookies.txt' --cookie-jar '/tmp/google_cookies.txt' -X POST -s -H "$AGENT" "https://accounts.google.com/accountLoginInfoXhr" -d "Email=$1&Page=PasswordSeparationAddSession&requestlocation=https%3A%2F%2Faccounts.google.com%2FAddSession%23identifier"`
 	if [[ $LOGIN == *email* && $INITIAL == *name=\"gxf\"* ]]; then
 		echo -e "\t${BANNERT}Login OK${NC}"
 
-		GXF=${INITIAL##*name=\"gxf\"}
-		GXF=${GXF##*value=\"}
-		GXF=${GXF%%\"*}
 	
 		TIMESTMP=${INITIAL##*name=\"timeStmp\"}
 		TIMESTMP=${TIMESTMP##*value=\"}
@@ -47,7 +50,9 @@ if [[ $1 && $2 ]]; then
 		PROFILE=${LOGIN##*encoded_profile_information\":\"}
 		PROFILE=${PROFILE%%\"*}
 		
-		PASS=`curl -L --cookie '/tmp/google_cookies.txt' --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/AddSession" -d "Page=PasswordSeparationAddSession&timeStmp=$TIMESTMP&Email=$1&Passwd=$2&identifiertoken=&identifiertoken_audio=&identifier-captcha-input=&_utf8=☃&ProfileInformation=$PROFILE&gxf=$GXF&bgresponse=$BGRESPONSE"`
+		
+		
+		PASS=`curl -L --cookie '/tmp/google_cookies.txt' --cookie-jar '/tmp/google_cookies.txt' -X POST -s -H "$AGENT" "https://accounts.google.com/AddSession" -d "Page=PasswordSeparationAddSession&timeStmp=$TIMESTMP&Email=$1&Passwd=$2&identifiertoken=&identifiertoken_audio=&identifier-captcha-input=&_utf8=☃&ProfileInformation=$PROFILE&gxf=$GXF&bgresponse=$BGRESPONSE"`
 		echo $PASS
 		#cat '/tmp/google_cookies.txt'
 	else
