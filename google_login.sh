@@ -23,14 +23,37 @@ banner
 
 if [[ $1 && $2 ]]; then
 	AGENT='User-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.73 Safari/537.36'
-	curl --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/AddSession" > /dev/null
-	LOGIN=`curl --cookie '/tmp/google_cookies.txt' --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/accountLoginInfoXhr" -d "Email=$1&requestlocation=https%3A%2F%2Faccounts.google.com%2FAddSession%23identifier"`
-	if [[ $LOGIN == *email* ]]; then
-		echo -e "${BANNERT}Login OK${NC}"
-		PASS=`curl -L --cookie '/tmp/google_cookies.txt' --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/AddSession" -d "Page=PasswordSeparationAddSession&Email=$1&Passwd=$2"`
-		echo $PASS
+	INITIAL=`curl -s -L --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/AddSession"`
+	LOGIN=`curl --cookie '/tmp/google_cookies.txt' --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/accountLoginInfoXhr" -d "Email=$1&Page=PasswordSeparationAddSession&requestlocation=https%3A%2F%2Faccounts.google.com%2FAddSession%23identifier"`
+	if [[ $LOGIN == *email* && $INITIAL == *name=\"gxf\"* ]]; then
+		echo -e "\t${BANNERT}Login OK${NC}"
+		
+		echo ${INITIAL##*name=}
+		
+		GXF=${INITIAL##*name=\"gxf\"}
+		GXF=${GXF##*value=\"}
+		GXF=${GXF%%\"*}
+	
+		TIMESTMP=${INITIAL##*name=\"timeStmp\"}
+		TIMESTMP=${TIMESTMP##*value=\"}
+		TIMESTMP=${TIMESTMP%%\"*}
+	
+		BGRESPONSE=${INITIAL##*name=\"bgresponse\"}
+		BGRESPONSE=${BGRESPONSE##*value=\"}
+		BGRESPONSE=${BGRESPONSE%%\"*}
+	
+		SECTOK=${INITIAL##*name=\"secTok\"}
+		SECTOK=${SECTOK##*value=\"}
+		SECTOK=${SECTOK%%\"*}
+		
+		PROFILE=${LOGIN##*encoded_profile_information\":\"}
+		PROFILE=${PROFILE%%\"*}
+		
+		#PASS=`curl -I --cookie '/tmp/google_cookies.txt' --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/AddSession" -d "Page=PasswordSeparationAddSession&timeStmp=$TIME&Email=$1&Passwd=$2&identifiertoken=&identifiertoken_audio=&identifier-captcha-input=&_utf8=☃&ProfileInformation=$PROFILE&gxf=$GXF"`
+		#echo $PASS
+		#cat '/tmp/google_cookies.txt'
 	else
-		echo "${RED}Login incorreto${NC}"
+		echo -e "\t${RED}Login incorreto${NC}"
 	fi
 else
 	echo "Usage: bash $0 <login> <pass>"
