@@ -25,10 +25,12 @@ if [[ $1 && $2 ]]; then
 	AGENT='User-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.73 Safari/537.36'
 	curl --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/AddSession" > /dev/null
 	LOGIN=`curl --cookie '/tmp/google_cookies.txt' --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/accountLoginInfoXhr" -d "Email=$1&requestlocation=https%3A%2F%2Faccounts.google.com%2FAddSession%23identifier"`
-	if [[ -z `$LOGIN ]]; then
-		echo "Login incorreto"
+	if [[ $LOGIN == *email* ]]; then
+		echo -e "${BANNERT}Login OK${NC}"
+		PASS=`curl -L --cookie '/tmp/google_cookies.txt' --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/AddSession" -d "Page=PasswordSeparationAddSession&Email=$1&Passwd=$2"`
+		echo $PASS
 	else
-		echo $LOGIN
+		echo "${RED}Login incorreto${NC}"
 	fi
 else
 	echo "Usage: bash $0 <login> <pass>"
