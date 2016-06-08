@@ -24,8 +24,12 @@ banner
 if [[ $1 && $2 ]]; then
 	AGENT='User-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.73 Safari/537.36'
 	curl --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/AddSession" > /dev/null
-	LOGIN=`curl --cookie '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/accountLoginInfoXhr" -d "Email=$1&requestlocation=https%3A%2F%2Faccounts.google.com%2FAddSession%23identifier"`
-	echo $LOGIN
+	LOGIN=`curl --cookie '/tmp/google_cookies.txt' --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/accountLoginInfoXhr" -d "Email=$1&requestlocation=https%3A%2F%2Faccounts.google.com%2FAddSession%23identifier"`
+	if [[ -z `$LOGIN ]]; then
+		echo "Login incorreto"
+	else
+		echo $LOGIN
+	fi
 else
 	echo "Usage: bash $0 <login> <pass>"
 fi
