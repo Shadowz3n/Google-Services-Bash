@@ -24,11 +24,12 @@ GoogleLogin(){
 	INITIAL=`curl -s -L --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/AddSession"`
 	INITIAL=`echo $INITIAL | grep -Po '(?<=<form|<FORM>).*(?=</form|</FORM)'`
 	GXF=`echo $INITIAL | grep -Po '(?<=gxf" value=").*(?="> <input id="profile)'`
-	LOGIN=`curl --cookie '/tmp/google_cookies.txt' --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/accountLoginInfoXhr" -d "Email=$1&Page=PasswordSeparationAddSession&requestlocation=https%3A%2F%2Faccounts.google.com%2FAddSession%23identifier"`
+	TIME=`date +%s`
+	LOGIN=`curl --cookie '/tmp/google_cookies.txt' --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/accountLoginInfoXhr" -d "Email=$1&Page=PasswordSeparationAddSession&requestlocation=https%3A%2F%2Faccounts.google.com%2FAddSession%23identifier&timeStmp=$TIME"`
 	if [[ $LOGIN == *email* && $INITIAL == *name=\"gxf\"* ]]; then
 		echo -e "\t${BANNERT}Login OK${NC}"
 		PROFILE=`echo $LOGIN | grep -Po '(?<=encoded_profile_information":").*(?=","recovery_url)'`
-		PASS=`curl -L --cookie '/tmp/google_cookies.txt' --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/AddSession" -d "Page=PasswordSeparationAddSession&Email=$1&Passwd=$2&identifiertoken=&identifiertoken_audio=&identifier-captcha-input=&_utf8=☃&timeStmp=$(date +%s)&ProfileInformation=$PROFILE&gxf=$GXF&bgresponse=js_disabled"`
+		PASS=`curl -L --cookie '/tmp/google_cookies.txt' --cookie-jar '/tmp/google_cookies.txt' -s -H "$AGENT" "https://accounts.google.com/AddSession" -d "Page=PasswordSeparationAddSession&Email=$1&Passwd=$2&identifiertoken=&identifiertoken_audio=&identifier-captcha-input=&_utf8=☃&timeStmp=$TIME&ProfileInformation=$PROFILE&gxf=$GXF&bgresponse=js_disabled"`
 		echo $PASS | grep -Po '(?<=<title>|<TITLE>).*(?=</title>|</TITLE)'
 	else
 		echo -e "\t${RED}Login incorreto${NC}"
